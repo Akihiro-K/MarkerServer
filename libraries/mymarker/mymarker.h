@@ -28,7 +28,7 @@ using namespace Eigen;
 #define OFFSET_Y 0
 
 /* marker packet */
-struct Marker {
+struct Packet {
   uint32_t timestamp; // microseconds
   float position[3]; // meter
   float quaternion[3]; // x y z
@@ -37,7 +37,7 @@ struct Marker {
 } __attribute__((packed));
 
 static ofstream fout("../output_data/state.csv", ios::out);
-static struct Marker marker = {0, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, 0};
+static struct Packet packet = {0, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, 0};
 
 // =============================================================================
 

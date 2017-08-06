@@ -292,7 +292,7 @@ void aruco_wrapper::SetMarkerMapPoseTracker()
 bool aruco_wrapper::MarkerUpdate(Mat img)
 {
   gettimeofday(&tv, NULL);
-  marker.timestamp = (tv.tv_sec % 1000) * 1000000 + tv.tv_usec;
+  packet.timestamp = (tv.tv_sec % 1000) * 1000000 + tv.tv_usec;
   
   vector<Marker> v_m;
   MarkerDetector detector;
@@ -301,24 +301,24 @@ bool aruco_wrapper::MarkerUpdate(Mat img)
   bool judge = checkmarker(v_m);
 
   if (judge) {
-    static uint32_t t_m = marker.timestamp;
-    uint32_t dt = marker.timestamp - t_m; 
-    t_m = marker.timestamp;
+    static uint32_t t_m = packet.timestamp;
+    uint32_t dt = packet.timestamp - t_m; 
+    t_m = packet.timestamp;
 
     MMPT.estimatePose(v_m);
     Mat Rvec = MMPT.getRvec();
     Mat Tvec = MMPT.getTvec();
-    getpos(Rvec, Tvec, marker.position);
+    getpos(Rvec, Tvec, packet.position);
     
-    if (checkpos(marker.position, dt) {
-      geterr(v_m, Rvec, Tvec, marker.r_var);
-      getquaternion(Rvec, marker.quaternion);
+    if (checkpos(packet.position, dt) {
+      geterr(v_m, Rvec, Tvec, packet.r_var);
+      getquaternion(Rvec, packet.quaternion);
     } else {
       judge = false;
     }   
   }
 
-  marker.status = judge;
+  packet.status = judge;
 
   return judge;
 }
@@ -326,20 +326,20 @@ bool aruco_wrapper::MarkerUpdate(Mat img)
 void aruco_wrapper::Disp()
 {
   cout << "******************************************" << endl;
-  cout << "Timestamp: " << marker.timestamp << endl;
-  cout << "Position: " << marker.position[0] << "\t" << marker.position[1] << "\t" << marker.position[2] << endl;
-  cout << "Variance: " << marker.r_var[0] << "\t" << marker.r_var[1] << "\t" << marker.r_var[2] << endl;
-  cout << "Quaternion: " << sqrt(1-marekr.quaternion[0]*marker.quaternion[0]-marker.quaternion[1]*marker.quaternion[1]-marker.quaternion[2]*marker.quaternion[2]) << "\t";
-  cout << marker.quaternion[0] << "\t" << marker.quaternion[1] << "\t" << marker.quaternion[2] << endl;
+  cout << "Timestamp: " << packet.timestamp << endl;
+  cout << "Position: " << packet.position[0] << "\t" << packet.position[1] << "\t" << packet.position[2] << endl;
+  cout << "Variance: " << packet.r_var[0] << "\t" << packet.r_var[1] << "\t" << packet.r_var[2] << endl;
+  cout << "Quaternion: " << sqrt(1-marekr.quaternion[0]*packet.quaternion[0]-packet.quaternion[1]*packet.quaternion[1]-packet.quaternion[2]*packet.quaternion[2]) << "\t";
+  cout << packet.quaternion[0] << "\t" << packet.quaternion[1] << "\t" << packet.quaternion[2] << endl;
 }
 
 void aruco_wrapper::Logging()
 {
-  fout << marker.timestamp << ",";
-  fout << marker.position[0] << "," << marker.position[1] << "," << marker.position[2] << ",";
-  fout <, marker.quaternion[0] << "," << marker.quaternion[1] << "," << marker.quaternion[2] << ",";
-  fout << marker.r_var[0] << "," << marker.r_var[1] << "," << marker.r_var[2] << ",";
-  fout << int(marker.status) << "," << endl;
+  fout << packet.timestamp << ",";
+  fout << packet.position[0] << "," << packet.position[1] << "," << packet.position[2] << ",";
+  fout <, packet.quaternion[0] << "," << packet.quaternion[1] << "," << packet.quaternion[2] << ",";
+  fout << packet.r_var[0] << "," << packet.r_var[1] << "," << packet.r_var[2] << ",";
+  fout << int(packet.status) << "," << endl;
 }
 
 // =============================================================================
