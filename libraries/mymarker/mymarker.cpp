@@ -343,7 +343,7 @@ void aruco_wrapper::Logging()
   fout << int(packet.status) << "," << endl;
 }
 
-struct Packet* Packet()
+struct Packet* aruco_wrapper::Packet()
 {
   return &packet;
 }
