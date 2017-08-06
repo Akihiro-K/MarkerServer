@@ -210,7 +210,7 @@ void aruco_wrapper::getquaternion(Mat Rvec, float quat[3])
   Rodrigues(Rvec, rmat);
 
   float angle_x, angle_y, angle_z;
-  angle_x = -asin(rmat.at<float>(2,1)) - ANGLE;
+  angle_x = -asin(rmat.at<float>(2,1));
   angle_y = atan2(rmat.at<float>(2,0), rmat.at<float>(2,2));
   angle_z = atan2(-rmat.at<float>(1,1), rmat.at<float>(0,1));	
 
@@ -310,7 +310,7 @@ bool aruco_wrapper::MarkerUpdate(Mat img)
     Mat Tvec = MMPT.getTvec();
     getpos(Rvec, Tvec, packet.position);
     
-    if (checkpos(packet.position, dt) {
+    if (checkpos(packet.position, dt)) {
       geterr(v_m, Rvec, Tvec, packet.r_var);
       getquaternion(Rvec, packet.quaternion);
     } else {
@@ -329,7 +329,7 @@ void aruco_wrapper::Disp()
   cout << "Timestamp: " << packet.timestamp << endl;
   cout << "Position: " << packet.position[0] << "\t" << packet.position[1] << "\t" << packet.position[2] << endl;
   cout << "Variance: " << packet.r_var[0] << "\t" << packet.r_var[1] << "\t" << packet.r_var[2] << endl;
-  cout << "Quaternion: " << sqrt(1-marekr.quaternion[0]*packet.quaternion[0]-packet.quaternion[1]*packet.quaternion[1]-packet.quaternion[2]*packet.quaternion[2]) << "\t";
+  cout << "Quaternion: " << sqrt(1-packet.quaternion[0]*packet.quaternion[0]-packet.quaternion[1]*packet.quaternion[1]-packet.quaternion[2]*packet.quaternion[2]) << "\t";
   cout << packet.quaternion[0] << "\t" << packet.quaternion[1] << "\t" << packet.quaternion[2] << endl;
 }
 
@@ -337,7 +337,7 @@ void aruco_wrapper::Logging()
 {
   fout << packet.timestamp << ",";
   fout << packet.position[0] << "," << packet.position[1] << "," << packet.position[2] << ",";
-  fout <, packet.quaternion[0] << "," << packet.quaternion[1] << "," << packet.quaternion[2] << ",";
+  fout << packet.quaternion[0] << "," << packet.quaternion[1] << "," << packet.quaternion[2] << ",";
   fout << packet.r_var[0] << "," << packet.r_var[1] << "," << packet.r_var[2] << ",";
   fout << int(packet.status) << "," << endl;
 }
