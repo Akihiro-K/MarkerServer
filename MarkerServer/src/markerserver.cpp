@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
   Camera.set(CV_CAP_PROP_FPS, 60);
 
   aruco_wrapper System("../input_data/intrinsics2.yml", 
-                       "../input_data/map_2");
+                       "../input_data/map_2.yml");
 
   tcp_server s;
 
