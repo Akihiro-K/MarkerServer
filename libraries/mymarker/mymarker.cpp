@@ -266,12 +266,12 @@ bool aruco_wrapper::checkpos(float position[3], float dt)
 // =============================================================================
 // Public functions:
 
-aruco_wrapper(string pathforCP, string pathforMM)
+aruco_wrapper::aruco_wrapper(string pathforCP, string pathforMM)
 {
   SetCameraParameters(pathforCP);
   SetMarkerMap(pathforMM);
   SetMarkerMapPoseTracker();
-  timeclear(&tv);
+  timerclear(&tv);
 }
 
 void aruco_wrapper::SetCameraParameters(string filepath)
