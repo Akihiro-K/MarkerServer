@@ -37,15 +37,15 @@ enum RouteNumber {
   ROUTE_3 = 2,
 };
 
-static ifstream fin("file.json");
-
 static struct WayPoint waypoints_[N_ROUTES][MAX_WAYPOINTS] = { 0 };
 static float hold_position[3];
 
 static const struct WayPoint * curr_waypoint = &waypoints_[ROUTE_1][0];
 static const struct WayPoint * final_waypoint = &waypoints_[ROUTE_1][0];
 
-void InitNavigation();
+void ReadWPfromFile();
+
+void ReadWPfromDP();
 
 void UpdateNavigation();
 

@@ -1,5 +1,5 @@
-#include "../../libraries/mymarker/mymarker.h"
-#include "../../libraries/mytcp/tcpserver.h"
+#include "../../libraries/arucowrapper/arucowrapper.h"
+#include "../../libraries/tcp/tcpserver.h"
 
 #include <raspicam/raspicam_cv.h>
 

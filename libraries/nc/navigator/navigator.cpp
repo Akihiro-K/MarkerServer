@@ -1,8 +1,13 @@
 #include "navigator.h"
 
-void InitNavigation()
+void ReadWPfromFile()
 {
-  
+  // TO DO: read WPs from json file
+}
+
+void ReadWPfromDP()
+{
+  // TO DO: read WPs from DP
 }
 
 void UpdateNavigation()
@@ -10,22 +15,37 @@ void UpdateNavigation()
 // =============================================================================
 // Navigation Status Switching Algorithm:
 
+  static uint8_t marker_flag_for_nav = marker_flag;
+
+  static uint8_t marker_notdetected_count = 0;
+  if (marker_flag) {
+    marker_notdetected_count = 0;
+    marker_flag_for_nav = 1;
+  } else {
+    marker_notdetected_count += 1;
+    if (marker_notdetected_count > 64) {
+      marker_flag_for_nav = 0;
+      marker_notdetected_count = 65;
+    }		
+  }
+
   /* Heading part */
-  if (marker_flag||lsm_flag) {
+  // no heading 
+  if (marker_flag_for_nav||lsm_flag||gps_vel_flag) {
     to_fc.navigation_status |= HeadingOK;
   } else {
     to_fc.navigation_status &= ~HeadingOK;
   }
 
   /* Position part */
-  if (marker_flag||gps_pos_flag) {
+  if (marker_flag_for_nav||gps_pos_flag) {
     to_fc.navigation_status |= PositionOK;
   } else {
     to_fc.navigation_status &= ~PositionOK;
   }
 
   /* Velocity part */
-  if (marker_flag||gps_vel_flag) {
+  if (marker_flag_for_nav||gps_vel_flag) {
     to_fc.navigation_status |= VelocityOK;
   } else {
     to_fc.navigation_status &= ~VelocityOK;
@@ -34,7 +54,7 @@ void UpdateNavigation()
   /* low precision vertical part */
   // when marker is unavailable
   // altitude control is peformed by barometer
-  if (!marker_flag) {
+  if (!marker_flag_for_nav) {
     to_fc.navigation_status |= LOW_PRECISION_VERTICAL;
   } else {
     to_fc.navigation_status &= ~LOW_PRECISION_VERTICAL;
@@ -42,6 +62,11 @@ void UpdateNavigation()
 
 // =============================================================================
 // Navigation mode Switching Algorithm:
+
+  // if nav_mode_request is different from 
+  // previous nav_mode
+  // switch nav_mode according to the
+  // following algorithm
 
   if (from_fc.nav_mode_request != nav_mode_) {
     switch (from_fc.nav_mode_request) {
@@ -88,6 +113,7 @@ void UpdateNavigation()
   switch (nav_mode_) {
     case NAV_MODE_AUTO:
     {
+      // TO DO: Consider how to generate target from WP
       break;
     }
     case NAV_MODE_HOLD:
@@ -113,16 +139,10 @@ void UpdateNavigation()
 
 void UpdateMarkerFlag()
 {
-  static uint8_t marker_notdetected_count = 0;
   if (from_marker.status) {
-    marker_notdetected_count = 0;
     marker_flag = 1;
   } else {
-    marker_notdetected_count += 1;
-    if (marker_notdetected_count > 4) {
-      marker_flag = 0;
-      marker_notdetected_count = 5;
-    }		
+    marker_flag = 0;
   }
 }
 

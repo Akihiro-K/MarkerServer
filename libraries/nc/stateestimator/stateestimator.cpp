@@ -38,7 +38,7 @@ void PositionTimeUpdate()
     u = DCM * (a_b + Vector3f::UnitZ()); // remove acceleration due to gravity
   } else {
     for (int i = 0; i < 3; i++) {
-        u(i) = 0;
+      u(i) = 0;
     }
   }
 
@@ -46,7 +46,7 @@ void PositionTimeUpdate()
     // velocity is unavailable from any sensor
 
     for (int i = 0; i < 3; i++) {
-        x(i+3) = 0;
+      x(i+3) = 0;
     }
   }
 
@@ -71,7 +71,7 @@ void PositionMeasurementUpdateWithMarker()
     // position is initialized to raw reading from marker
     if (!init_marker_flag) {
       for (int i = 0; i < 3; i++) {
-          x(i) = from_marker.position[i];
+        x(i) = from_marker.position[i];
       }
     }
     init_marker_flag = 1;
@@ -219,6 +219,8 @@ void AttitudeMeasurementUpdateWithMarker()
     Matrix3f K;
     K = P_att * H.transpose() * (H * P_att * H.transpose() + R).inverse();
 
+    P_att = (MatrixXf::Identity(3,3)-K * H) * P_att;
+
     Vector3f alpha = K * dz;
     MatrixXf Psi(4,3); // Conversion matrix from alpha to delta quaternion
     Psi << -0.5*quat[1], -0.5*quat[2], -0.5*quat[3],
@@ -277,6 +279,8 @@ void AttitudeMeasurementUpdateWithLSM()
     Matrix3f K;
     K = P_att * H.transpose() * (H * P_att * H.transpose() + R).inverse();
 
+    P_att = (MatrixXf::Identity(3,3)-K * H) * P_att;
+
     Vector3f alpha = K * dz;
     MatrixXf Psi(4,3); // Conversion matrix from alpha to delta quaternion
     Psi << -0.5*quat[1], -0.5*quat[2], -0.5*quat[3],
@@ -329,6 +333,8 @@ void AttitudeMeasurementUpdateWithGPSVel()
 
     // Matrix3f K;
     // K = P_att * H.transpose() * (H * P_att * H.transpose() + R).inverse();
+
+    // P_att = (MatrixXf::Identity(3,3)-K * H) * P_att;
 
     // Vector3f alpha = K * dz;
     // MatrixXf Psi(4,3); // Conversion matrix from alpha to delta quaternion
