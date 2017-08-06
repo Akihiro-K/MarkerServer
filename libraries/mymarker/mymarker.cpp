@@ -272,6 +272,7 @@ aruco_wrapper::aruco_wrapper(string pathforCP, string pathforMM)
   SetMarkerMap(pathforMM);
   SetMarkerMapPoseTracker();
   timerclear(&tv);
+  packet = {0, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, 0};
 }
 
 void aruco_wrapper::SetCameraParameters(string filepath)
@@ -340,6 +341,11 @@ void aruco_wrapper::Logging()
   fout << packet.quaternion[0] << "," << packet.quaternion[1] << "," << packet.quaternion[2] << ",";
   fout << packet.r_var[0] << "," << packet.r_var[1] << "," << packet.r_var[2] << ",";
   fout << int(packet.status) << "," << endl;
+}
+
+struct Packet* Packet()
+{
+  return &packet;
 }
 
 // =============================================================================

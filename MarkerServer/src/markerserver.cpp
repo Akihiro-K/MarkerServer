@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
         System.Disp();        
       }
       System.Logging();
-      s.send_data((const char *)&packet, sizeof(packet));
+      s.send_data((const char *)System.Packet(), sizeof(*System.Packet()));
     }
   }
     return 0;

@@ -37,7 +37,6 @@ struct Packet {
 } __attribute__((packed));
 
 static ofstream fout("../output_data/state.csv", ios::out);
-static struct Packet packet = {0, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, 0};
 
 // =============================================================================
 
@@ -48,6 +47,7 @@ private:
   CameraParameters CP;
   MarkerMapPoseTracker MMPT;
   struct timeval tv;
+  struct Packet packet;
   void getpos(Mat Rvec, Mat Tvec, float position[3]);
   void geterr_(Marker marker, Mat Rvec, Mat Tvec, float err_[3]);
   void geterr(vector<Marker> v_m, Mat Rvec, Mat Tvec, float err[3]);
@@ -63,6 +63,7 @@ public:
   bool MarkerUpdate(Mat img);
   void Disp();
   void Logging();
+  struct Packet* Packet();
 };
 
 #endif // MYMARKER_H_
