@@ -7,9 +7,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -18,14 +15,6 @@
 using namespace std;
 using namespace cv;
 using namespace aruco;
-using namespace Eigen;
-
-// =============================================================================
-// Parameters:
-
-/* mount offset [m] */
-#define OFFSET_X 0
-#define OFFSET_Y 0
 
 /* marker packet */
 struct Packet {
@@ -36,23 +25,22 @@ struct Packet {
   uint8_t status; // 1 : detected, 0 : not detected
 } __attribute__((packed));
 
-static ofstream fout("../output_data/state.csv", ios::out);
-
-// =============================================================================
-
 class aruco_wrapper
 {
 private:
-  MarkerMap MM;
-  CameraParameters CP;
-  MarkerMapPoseTracker MMPT;
+  aruco::MarkerMap MM;
+  aruco:CameraParameters CP;
+  aruco::MarkerMapPoseTracker MMPT;
   struct timeval tv;
   struct Packet packet;
-  void getpos(Mat Rvec, Mat Tvec, float position[3]);
-  void geterr_(Marker marker, Mat Rvec, Mat Tvec, float err_[3]);
-  void geterr(vector<Marker> v_m, Mat Rvec, Mat Tvec, float err[3]);
-  void getquaternion(Mat Rvec, float quaternion[3]);
-  bool checkmarker(vector<Marker> v_m);
+  float offset_x_; // [m]
+  float offset_y_; // [m]
+  float offset_z_; // [m]
+  void getpos(cv::Mat Rvec, cv::Mat Tvec, float position[3]);
+  void geterr_(aruco::Marker marker, cv::Mat Rvec, cv::Mat Tvec, float err_[3]);
+  void geterr(vector<aruco::Marker> v_m, cv::Mat Rvec, cv::Mat Tvec, float err[3]);
+  void getquaternion(cv::Mat Rvec, float quaternion[3]);
+  bool checkmarker(vector<aruco::Marker> v_m);
   bool checkpos(float position[3], float dt);
 public:
   aruco_wrapper(string pathforCP, string pathforMM);
@@ -60,7 +48,8 @@ public:
   void SetCameraParameters(string filepath);
   void SetMarkerMap(string filepath);
   void SetMarkerMapPoseTracker();
-  bool MarkerUpdate(Mat img);
+  void SetOffset(float offset_x, float offset_y, float offset_z);
+  bool MarkerUpdate(cv::Mat img);
   void Disp();
   void Logging();
   struct Packet* Packet();
