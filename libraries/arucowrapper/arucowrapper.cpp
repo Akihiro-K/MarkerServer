@@ -14,12 +14,13 @@ static ofstream fout("../output_data/state.csv", ios::out);
 
 void aruco_wrapper::getpos(cv::Mat Rvec, cv::Mat Tvec, float position[3])
 {
-  cv::Mat pos, rmat;
+  cv::Mat pos, rmat, offset;
   cv::Rodrigues(Rvec, rmat);
-  pos = -rmat.inv() * Tvec.t();
-  position[0] = pos.at<float>(0,0) - offset_x_;
-  position[1] = pos.at<float>(0,1) - offset_y_;
-  position[2] = pos.at<float>(0,2) - offset_z_;
+  offset = cv::Mat_<float>(1,3) << offset_x_, offset_y_, offset_z_;
+  pos = -rmat.inv() * (Tvec.t() - offset);
+  position[0] = pos.at<float>(0,0);
+  position[1] = pos.at<float>(0,1);
+  position[2] = pos.at<float>(0,2);
 }
 
 void aruco_wrapper::geterr_(aruco::Marker marker, cv::Mat Rvec, cv::Mat Tvec, float err_[3])
@@ -304,7 +305,7 @@ void aruco_wrapper::SetMarkerMapPoseTracker()
   MMPT.setParams(CP, MM);
 }
 
-void SetOffset(float offset_x, float offset_y)
+void aruco_wrapper::SetOffset(float offset_x, float offset_y, float offset_z)
 {
   offset_x_ = offset_x;
   offset_y_ = offset_y;

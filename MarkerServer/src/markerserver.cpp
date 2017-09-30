@@ -7,6 +7,7 @@
 #include <iomanip>
 
 using namespace raspicam;
+using json = nlohman::json;
 
 // =============================================================================
 // Sample WayPoint file (.json):
@@ -33,14 +34,14 @@ int main(int argc, char const *argv[])
                        "../input_data/map.yml");
 
   if (argc == 2) {
-    std::ifs ifstream("../input_data/mount.json");
+    std::ifstream ifs("../input_data/mount.json");
     json j_;
     ifs >> j_;
     std::ostringstream oss1;
     oss1 << "mount_" << atoi(argv[1]);
     std::string mount_name = oss1.str();
     float offset_x = j_[mount_name.c_str()]["x"];
-    float offset_y = j_[mount_name.c_ctr()]["y"];
+    float offset_y = j_[mount_name.c_str()]["y"];
     float offset_z = j_[mount_name.c_str()]["z"];
     System.SetOffset(offset_x, offset_y, offset_z);
   }

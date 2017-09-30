@@ -29,7 +29,7 @@ class aruco_wrapper
 {
 private:
   aruco::MarkerMap MM;
-  aruco:CameraParameters CP;
+  aruco::CameraParameters CP;
   aruco::MarkerMapPoseTracker MMPT;
   struct timeval tv;
   struct Packet packet;
