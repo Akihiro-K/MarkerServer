@@ -14,13 +14,15 @@ static ofstream fout("../output_data/state.csv", ios::out);
 
 void aruco_wrapper::getpos(cv::Mat Rvec, cv::Mat Tvec, float position[3])
 {
-  cv::Mat pos, rmat, offset;
+  cv::Mat pos, rmat;
   cv::Rodrigues(Rvec, rmat);
-  offset = cv::Mat_<float>(1,3) << offset_x_, offset_y_, offset_z_;
-  pos = -rmat.inv() * (Tvec.t() - offset);
+  Tvec.at<float>(0,0) -= offset_x_;
+  Tvec.at<float>(0,1) -= offset_y_;
+  Tvec.at<float>(0,2) -= offset_z_;
+  pos = -rmat.inv() * Tvec.t();
   position[0] = pos.at<float>(0,0);
-  position[1] = pos.at<float>(0,1);
-  position[2] = pos.at<float>(0,2);
+  position[1] = pos.at<float>(1,0);
+  position[2] = pos.at<float>(2,0);
 }
 
 void aruco_wrapper::geterr_(aruco::Marker marker, cv::Mat Rvec, cv::Mat Tvec, float err_[3])
@@ -283,6 +285,7 @@ aruco_wrapper::aruco_wrapper(string pathforCP, string pathforMM)
 {
   offset_x_ = 0;
   offset_y_ = 0;
+  offset_z_ = 0;
   SetCameraParameters(pathforCP);
   SetMarkerMap(pathforMM);
   SetMarkerMapPoseTracker();
