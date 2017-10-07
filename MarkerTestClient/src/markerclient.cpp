@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 struct FromMarker {
   uint32_t timestamp; // microseconds
   float position[3]; // meter
@@ -24,7 +22,7 @@ int main(int argc, char const *argv[])
   for(;;){
     // at 10 ~ 15HZ
     c.recv_data(MarkerHandler);
-    cout << from_marker.position[0] << "\t" << from_marker.position[1] << "\t" << from_marker.position[2] << endl;
+    std::cout << from_marker.position[0] << "\t" << from_marker.position[1] << "\t" << from_marker.position[2] << std::endl;
   }
 }
 

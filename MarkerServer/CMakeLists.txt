@@ -10,7 +10,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(EIGEN3_INCLUDE_DIR)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libraries/arucowrapper ${CMAKE_CURRENT_BINARY_DIR}/arucowrapper_build)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tcp ${CMAKE_CURRENT_BINARY_DIR}/tcp_build)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libraries/utserial ${CMAKE_CURRENT_BINARY_DIR}/utserial_build)
 
 add_executable(markerserver src/markerserver.cpp)
-target_link_libraries(markerserver  ${aruco_LIBS} ${OpenCV_LIBS} ${raspicam_CV_LIBS} ArucoWrapper TCPServer)
+target_link_libraries(markerserver  ${aruco_LIBS} ${OpenCV_LIBS} ${raspicam_CV_LIBS} ArucoWrapper UTSerial)

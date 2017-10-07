@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
-add_library(TCPServer STATIC
-  tcpserver.cpp
-)
-add_library(TCPClient STATIC
-  tcpclient.cpp
+add_library(UTSerial STATIC
+  utserial.cpp
 )
 
 include(CheckCXXCompilerFlag)

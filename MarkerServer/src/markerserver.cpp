@@ -1,5 +1,5 @@
 #include "../../libraries/arucowrapper/arucowrapper.h"
-#include "../../libraries/tcp/tcpserver.h"
+#include "../../libraries/tcp/utserial.h"
 #include "json.hpp"
 
 #include <raspicam/raspicam_cv.h>
@@ -8,6 +8,11 @@
 
 using namespace raspicam;
 using json = nlohman::json;
+
+#define SERIAL_BAUDRATE_MKR (57600)
+#define UT_SERIAL_COMPONENT_ID_RASPI (2)
+
+const char SERIAL_PORT_MKR[] = "/dev/ttyAMA0";
 
 // =============================================================================
 // Sample WayPoint file (.json):
@@ -46,14 +51,10 @@ int main(int argc, char const *argv[])
     System.SetOffset(offset_x, offset_y, offset_z);
   }
 
-  tcp_server s;
-
-  // accept connection
-  s.start_listen(8080);
-  s.start_accept();
+  ut_serial FC_comm(SERIAL_PORT_MKR, SERIAL_BAUDRATE_MKR);
 
   if (Camera.open()) {
-    cout << "Capture is opened" << endl;
+    std::cout << "Capture is opened" << std::endl;
     for(;;){
       Camera.grab();
       Camera.retrieve(img);
@@ -62,7 +63,7 @@ int main(int argc, char const *argv[])
         System.Disp();
       }
       System.Logging();
-      s.send_data((const char *)System.Packet(), sizeof(*System.Packet()));
+      FC_comm.send_data(UT_SERIAL_COMPONENT_ID_RASPI, 1, (uint8_t *)System.Packet(), sizeof(*System.Packet()));
     }
   }
     return 0;
