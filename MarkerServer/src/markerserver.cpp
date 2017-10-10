@@ -1,5 +1,5 @@
 #include "../../libraries/arucowrapper/arucowrapper.h"
-#include "../../libraries/tcp/utserial.h"
+#include "../../libraries/utserial/utserial.h"
 #include "json.hpp"
 
 #include <raspicam/raspicam_cv.h>
@@ -7,7 +7,7 @@
 #include <iomanip>
 
 using namespace raspicam;
-using json = nlohman::json;
+using json = nlohmann::json;
 
 #define SERIAL_BAUDRATE_MKR (57600)
 #define UT_SERIAL_COMPONENT_ID_RASPI (2)
