@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
   Camera.set(CV_CAP_PROP_FORMAT, CV_8UC1);
   Camera.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   Camera.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
-  Camera.set(CV_CAP_PROP_FPS, 60);
+  Camera.set(CV_CAP_PROP_FPS, 32);
 
 //  aruco_wrapper System("../input_data/intrinsics2.yml",
 //                       "../input_data/map_2.yml");

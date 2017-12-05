@@ -309,17 +309,20 @@ bool aruco_wrapper::MarkerUpdate(Mat img)
     uint32_t dt = packet.timestamp - t_m; 
     t_m = packet.timestamp;
 
-    MMPT.estimatePose(v_m);
-    Mat Rvec = MMPT.getRvec();
-    Mat Tvec = MMPT.getTvec();
-    getpos(Rvec, Tvec, packet.position);
-    
-    if (checkpos(packet.position, dt)) {
-      geterr(v_m, Rvec, Tvec, packet.r_var);
-      getquaternion(Rvec, packet.quaternion);
-    } else {
-      judge = false;
-    }   
+    if (MMPT.estimatePose(v_m)) {
+		Mat Rvec = MMPT.getRvec();
+		Mat Tvec = MMPT.getTvec();
+		getpos(Rvec, Tvec, packet.position);
+		if (checkpos(packet.position, dt)) {
+		  geterr(v_m, Rvec, Tvec, packet.r_var);
+		  getquaternion(Rvec, packet.quaternion);
+		} else {
+		  judge = false;
+		}   
+	} else {
+		judge = false;
+	}
+
   }
 
   packet.status = judge;
