@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
     "../input_data/intrinsics.yml";
   std::vector<string> marker_map_paths = {
     "../input_data/droneport.yml",
-    "../input_data/droneport_old.yml"};
+    "../input_data/payload.yml"};
   multi_aruco_wrapper System(camera_parameter_path,marker_map_paths);
   tcp_server s;
 
