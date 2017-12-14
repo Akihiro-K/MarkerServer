@@ -61,9 +61,24 @@ public:
   void SetMarkerMap(string filepath);
   void SetMarkerMapPoseTracker();
   bool MarkerUpdate(Mat img);
+  bool MarkerUpdateFromDetectedMarkers(vector<Marker> v_m);
   void Disp();
   void Logging();
   struct Packet* Packet();
+};
+
+class multi_aruco_wrapper
+{
+private:
+  int nmaps;
+  vector<aruco_wrapper> wrappers;
+public:
+  multi_aruco_wrapper(string pathforCP, vector<string> pathforMM);
+  ~multi_aruco_wrapper() {};
+  bool MarkerUpdate(Mat img);
+  void Disp();
+  void Logging();
+  struct Packet* Packet(int i);
 };
 
 #endif // MYMARKER_H_

@@ -330,6 +330,62 @@ bool aruco_wrapper::MarkerUpdate(Mat img)
   return judge;
 }
 
+bool aruco_wrapper::MarkerUpdateFromDetectedMarkers(vector<Marker> v_m)
+{
+  gettimeofday(&tv, NULL);
+  packet.timestamp = (tv.tv_sec % 1000) * 1000000 + tv.tv_usec;
+  
+  /*
+  vector<Marker> v_m;
+  MarkerDetector detector;
+  detector.detect(img, v_m);
+
+  bool judge = checkmarker(v_m);
+  */
+  
+  vector<Marker> v_m_valid;
+  if(v_m.size()){
+    vector<int> MM_ids;
+    MM.getIdList(MM_ids);
+    // check whether id for each detected marker is included in MM_ids
+    vector<int>::iterator it;
+    for (int i = 0; i < v_m.size(); i++) {
+      it = find(MM_ids.begin(), MM_ids.end(), v_m[i].id);
+      if (it != MM_ids.end()) {
+        v_m_valid.push_back(v_m[i]);
+      }
+    }
+  }
+  bool judge = true;
+  if(!v_m_valid.size()) judge = false;
+
+
+  if (judge) {
+    static uint32_t t_m = packet.timestamp;
+    uint32_t dt = packet.timestamp - t_m; 
+    t_m = packet.timestamp;
+
+    if (MMPT.estimatePose(v_m_valid)) {
+        Mat Rvec = MMPT.getRvec();
+        Mat Tvec = MMPT.getTvec();
+        getpos(Rvec, Tvec, packet.position);
+        if (checkpos(packet.position, dt)) {
+          geterr(v_m_valid, Rvec, Tvec, packet.r_var);
+          getquaternion(Rvec, packet.quaternion);
+        } else {
+          judge = false;
+        }   
+    } else {
+        judge = false;
+    }
+
+  }
+
+  packet.status = judge;
+
+  return judge;
+}
+
 void aruco_wrapper::Disp()
 {
   cout << "******************************************" << endl;
@@ -352,6 +408,52 @@ void aruco_wrapper::Logging()
 struct Packet* aruco_wrapper::Packet()
 {
   return &packet;
+}
+
+// =============================================================================
+
+multi_aruco_wrapper::multi_aruco_wrapper(string pathforCP, vector<string> pathforMM)
+{
+  nmaps = pathforMM.size();
+  wrappers.reserve(nmaps);
+  for(int i = 0; i < nmaps; i++){
+      wrappers.push_back(aruco_wrapper(pathforCP,pathforMM[i]));
+  }
+}
+
+bool multi_aruco_wrapper::MarkerUpdate(Mat img)
+{
+  vector<Marker> v_m;
+  MarkerDetector detector;
+  detector.detect(img, v_m);
+  
+  for(int i = 0; i < nmaps; i++){
+      wrappers[i].MarkerUpdateFromDetectedMarkers(v_m);
+  }
+}
+
+void multi_aruco_wrapper::Disp()
+{
+  cout << "******************************************" << endl;
+  cout << "Timestamp: " << Packet(0)->timestamp << endl;
+  cout << "Position 0: " << Packet(0)->position[0] << "\t" << Packet(0)->position[1] << "\t" << Packet(0)->position[2] << endl;
+  cout << "Position 1: " << Packet(1)->position[0] << "\t" << Packet(1)->position[1] << "\t" << Packet(1)->position[2] << endl;
+}
+
+void multi_aruco_wrapper::Logging()
+{
+  for(int i = 0; i < nmaps; i++){
+    fout << i << "," << Packet(i)->timestamp << ",";
+    fout << Packet(i)->position[0] << "," << Packet(i)->position[1] << "," << Packet(i)->position[2] << ",";
+    fout << Packet(i)->quaternion[0] << "," << Packet(i)->quaternion[1] << "," << Packet(i)->quaternion[2] << ",";
+    fout << Packet(i)->r_var[0] << "," << Packet(i)->r_var[1] << "," << Packet(i)->r_var[2] << ",";
+    fout << int(Packet(i)->status) << "," << endl;
+  }
+}
+
+struct Packet* multi_aruco_wrapper::Packet(int i)
+{
+  return wrappers[i].Packet();
 }
 
 // =============================================================================
