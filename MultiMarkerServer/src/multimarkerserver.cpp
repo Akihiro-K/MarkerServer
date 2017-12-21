@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
   Camera.set(CV_CAP_PROP_FPS, 32);
 
   string camera_parameter_path =
-    "../input_data/camera_module_v2_640x480.yml.yml";
+    "../input_data/camera_module_v2_640x480.yml";
   std::vector<string> marker_map_paths = {
     "../input_data/droneport.yml",
     "../input_data/payload.yml"};
