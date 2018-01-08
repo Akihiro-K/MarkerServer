@@ -63,6 +63,83 @@ void FIFOReader::flush(){
   }
 }
 
+bool UTFIFOReader::ProcessIncomingByte(uint8_t byte,
+  std::function<void (uint8_t, uint8_t, const uint8_t *, size_t)> handler)
+{
+  static uint8_t * data_buffer_ptr = NULL;
+  static uint8_t bytes_processed = 0, payload_length = 0;
+  static uint8_t component_id = 0, message_id = 0;
+  static union U16Bytes crc;
+
+  switch (bytes_processed)
+  {
+      case 0:  // sync char
+          if (byte != UT_START_CHARACTER) goto RESET;
+          break;
+      case 1:  // payload length
+          payload_length = byte;
+          crc.u16 = CRCUpdateCCITT(0xFFFF, byte);
+          data_buffer_ptr = data_buffer;
+          break;
+      case 2:  // message ID
+          message_id = byte;
+          crc.u16 = CRCUpdateCCITT(crc.u16, byte);
+          break;
+      case 3:  // component ID
+          component_id = byte;
+          crc.u16 = CRCUpdateCCITT(crc.u16, byte);
+          break;
+      default:  // Payload or checksum
+          if (bytes_processed < (4 + payload_length))  // Payload
+          {
+              *data_buffer_ptr++ = byte;
+              crc.u16 = CRCUpdateCCITT(crc.u16, byte);
+          }
+          else if (bytes_processed == (4 + payload_length))  // CRC A
+          {
+            if (byte != crc.bytes[0]) goto RESET;
+          }
+          else // CRC B
+          {
+            if (byte == crc.bytes[1]) {
+              handler(component_id, message_id, (const uint8_t *)&data_buffer, sizeof(data_buffer));
+              return true;
+            }
+            goto RESET;
+          }
+          break;
+  }
+  bytes_processed++;
+  return false;
+
+RESET:
+  bytes_processed = 0;
+  return false;
+}
+
+void UTFIFOWriter::send_data(const char * src, size_t len){
+
+  uint8_t message_id = 0;
+  uint8_t component_id = 0;
+
+  union U16Bytes crc = { 0xFFFF };
+  crc.u16 = CRCUpdateCCITT(crc.u16, len);
+  crc.u16 = CRCUpdateCCITT(crc.u16, message_id);
+  crc.u16 = CRCUpdateCCITT(crc.u16, component_id);
+  for(int i = 0; i < len; i++){
+    crc.u16 = CRCUpdateCCITT(crc.u16, src[i]);
+  }
+
+  write_byte(UT_START_CHARACTER);
+  write_byte(len);
+  write_byte(message_id);
+  write_byte(component_id);
+  write_bytes(src,len);
+  write_byte(crc.bytes[0]);
+  write_byte(crc.bytes[1]);
+}
+
+
 //=============================================================================
 // Private functions:
 bool FIFOWriter::file_exist(const std::string& name)
@@ -83,5 +160,13 @@ void FIFOReader::get_new_byte()
     new_byte_available = true;
   }else{
     new_byte_available = false;
+  }
+}
+
+void UTFIFOReader::recv_data(std::function<void (uint8_t, uint8_t, const uint8_t *, size_t)> handler)
+{
+  while(available()){
+    uint8_t byte = (uint8_t) read_byte();
+    ProcessIncomingByte(byte, handler);
   }
 }
