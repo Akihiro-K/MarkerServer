@@ -16,7 +16,7 @@ FIFOWriter::FIFOWriter(std::string name)
 
   // reader must open before writer, so create a dummy
   int dummy = open(name.c_str(), O_RDONLY | O_NONBLOCK);
-  if((fd=open("/dev/fifotest",O_WRONLY | O_NONBLOCK))==-1){
+  if((fd=open(name.c_str(),O_WRONLY | O_NONBLOCK))==-1){
     perror("open (FIFOWriter)");
     exit(-1);
   }
