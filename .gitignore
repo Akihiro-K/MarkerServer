@@ -5,4 +5,5 @@
 /MarkerServer/build
 /MarkerTestClient/build
 /MultiMarkerServer/build
+/FIFOTest/build
 !*.gitkeep
