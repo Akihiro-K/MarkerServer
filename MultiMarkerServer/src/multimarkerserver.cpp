@@ -1,9 +1,6 @@
 #include "../../libraries/arucowrapper/arucowrapper.h"
-#include "../../libraries/tcp/tcpserver.h"
+#include "../../libraries/fifo/fifo.h"
 #include <raspicam/raspicam_cv.h>
-
-#define TCP_PORT_MARKER (8080)
-#define TCP_PORT_PAYLOAD (8081)
 
 using namespace raspicam;
 
@@ -23,15 +20,9 @@ int main(int argc, char const *argv[])
     "../input_data/droneport.yml",
     "../input_data/payload.yml"};
   multi_aruco_wrapper System(camera_parameter_path,marker_map_paths);
-  tcp_server s1; // server for sending position relative to marker
-  tcp_server s2; // server for sending position relative to payload
-
-  // accept connection
-  s1.start_listen(TCP_PORT_MARKER);
-  s1.start_accept();
-  s2.start_listen(TCP_PORT_PAYLOAD);
-  s2.start_accept();
-
+  UTFIFOWriter fw_marker = UTFIFOWriter("/dev/marker_fifo");
+  UTFIFOWriter fw_payload = UTFIFOWriter("/dev/payload_fifo");
+  
   if (Camera.open()) {
     cout << "Capture is opened" << endl;
     for(;;){
@@ -42,8 +33,8 @@ int main(int argc, char const *argv[])
         System.Disp();
       }
       System.Logging();
-      s1.send_data((const char *)System.Packet(0), sizeof(*System.Packet(0)));
-      s2.send_data((const char *)System.Packet(1), sizeof(*System.Packet(1)));
+      fw_marker.send_data((const char *)System.Packet(0), sizeof(*System.Packet(0)));
+      fw_payload.send_data((const char *)System.Packet(1), sizeof(*System.Packet(1)));
     }
   }
     return 0;

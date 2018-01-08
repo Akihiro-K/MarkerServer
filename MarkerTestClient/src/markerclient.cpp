@@ -1,4 +1,5 @@
-#include "../../libraries/tcp/tcpclient.h"
+//#include "../../libraries/tcp/tcpclient.h"
+#include "../../libraries/fifo/fifo.h"
 
 #include <iostream>
 
@@ -14,23 +15,32 @@ struct FromMarker {
 
 struct FromMarker from_marker = {0, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, 0};
 
-void MarkerHandler(const char * src, size_t len);
+//void MarkerHandler(const char * src, size_t len);
+void MarkerHandler(uint8_t component_id, uint8_t message_id, const uint8_t * src, size_t len);
+
+int new_data_flag = 0;  
 
 int main(int argc, char const *argv[])
 {
-  tcp_client c;
-  c.start_connect("127.0.0.1" , 8080);
-
+  //tcp_client c;
+  //c.start_connect("127.0.0.1" , 8080);
+  UTFIFOReader fr = UTFIFOReader("/dev/marker_fifo");
+  fr.flush();
+  
   for(;;){
     // at 10 ~ 15HZ
-    c.recv_data(MarkerHandler);
-    cout << from_marker.position[0] << "\t" << from_marker.position[1] << "\t" << from_marker.position[2] << endl;
+    //c.recv_data(MarkerHandler);
+    fr.recv_data(MarkerHandler);
+    if(new_data_flag){
+      cout << from_marker.position[0] << "\t" << from_marker.position[1] << "\t" << from_marker.position[2] << endl;
+      new_data_flag = 0;
+    }
   }
 }
 
-void MarkerHandler(const char * src, size_t len)
+void MarkerHandler(uint8_t component_id, uint8_t message_id, const uint8_t * src, size_t len)
 {
-  char temp[CLIENT_BUF_SIZE];
+  char temp[FIFO_DATA_BUFFER_LENGTH];
   memcpy(temp, src, len);
   struct FromMarker * struct_ptr = (struct FromMarker *)temp;
 
@@ -42,4 +52,6 @@ void MarkerHandler(const char * src, size_t len)
     from_marker.quaternion[i] = struct_ptr->quaternion[i];
     from_marker.r_var[i] = struct_ptr->r_var[i];
   }
+  
+  new_data_flag = 1;
 }

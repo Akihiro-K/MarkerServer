@@ -1,5 +1,6 @@
 #include "../../libraries/arucowrapper/arucowrapper.h"
-#include "../../libraries/tcp/tcpserver.h"
+//#include "../../libraries/tcp/tcpserver.h"
+#include "../../libraries/fifo/fifo.h"
 
 #include <raspicam/raspicam_cv.h>
 
@@ -19,11 +20,12 @@ int main(int argc, char const *argv[])
 //                       "../input_data/map_2.yml");
   aruco_wrapper System("../input_data/intrinsics3.yml",
                        "../input_data/map_3.yml");
-  tcp_server s;
+  //tcp_server s;
+  UTFIFOWriter fw = UTFIFOWriter("/dev/marker_fifo");
 
   // accept connection
-  s.start_listen(8080);
-  s.start_accept();
+  //s.start_listen(8080);
+  //s.start_accept();
 
   if (Camera.open()) {
     cout << "Capture is opened" << endl;
@@ -34,8 +36,10 @@ int main(int argc, char const *argv[])
         // display state when marker is detected
         System.Disp();
       }
+      
       System.Logging();
-      s.send_data((const char *)System.Packet(), sizeof(*System.Packet()));
+      //s.send_data((const char *)System.Packet(), sizeof(*System.Packet()));
+      fw.send_data((const char *)System.Packet(), sizeof(*System.Packet()));
     }
   }
     return 0;
