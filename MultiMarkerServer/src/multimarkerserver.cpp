@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
   string camera_parameter_path =
     "../input_data/camera_module_v2_640x480.yml";
   std::vector<string> marker_map_paths = {
-    "../input_data/droneport.yml",
+    "../input_data/droneport_old.yml",
     "../input_data/payload.yml"};
   multi_aruco_wrapper System(camera_parameter_path,marker_map_paths);
   UTFIFOWriter fw_marker = UTFIFOWriter("/dev/marker_fifo");
